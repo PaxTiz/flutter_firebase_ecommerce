@@ -27,13 +27,10 @@ class Product {
             description: snapshot.data()["description"].toString(),
             washable: snapshot.data()["name"].toString() == "true" ? true : false,
             washableTemp: int.parse(snapshot.data()["washable_temp"].toString()),
-            materials: snapshot.data()["materials"].map((m) =>
-                ProductMaterial(
-                    name: m["name"].toString(),
-                    percentage: int.parse(m["percentage"].toString())
-                )
-            ) as List<ProductMaterial>,
-            images: snapshot.data()["images"] as List<String>
+            materials: snapshot.data()["materials"].map<ProductMaterial>(
+                (doc) => ProductMaterial.fromFirebase(doc as Map)
+            ).toList() as List<ProductMaterial>,
+            images: List<String>.from(snapshot.data()["images"] as List)
         );
     }
 
@@ -44,5 +41,12 @@ class ProductMaterial {
     final String name;
     final int percentage;
     const ProductMaterial({@required this.name, @required this.percentage});
+
+    factory ProductMaterial.fromFirebase(Map<dynamic, dynamic> snapshot) {
+        return ProductMaterial(
+            name: snapshot["name"].toString(),
+            percentage: int.parse(snapshot["percentage"].toString())
+        );
+    }
 
 }
